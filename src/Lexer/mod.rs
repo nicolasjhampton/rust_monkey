@@ -2,23 +2,20 @@ mod token;
 pub use token::Token;
 
 use std::str::Chars;
-use std::iter::Peekable;
+
+fn is_number(string: &String) -> bool {
+    string.parse::<u8>().is_ok()
+}
 
 pub struct Lexer<'a> {
-    pub source: Chars<'a>,
-    position: usize,
-    read_position: usize,
-    ch: Option<char>
+    pub source: Chars<'a>
 }
 
 impl<'a> Lexer<'a> {
     pub fn new(source: &'a String) -> Lexer {
         let mut chars = source.chars();
         Lexer {
-            source: chars,
-            position: 0,
-            read_position: 0,
-            ch: None
+            source: chars
         } 
     }
 
@@ -33,15 +30,22 @@ impl<'a> Lexer<'a> {
             Some(')') => Some(Token::RPAREN),
             Some('{') => Some(Token::LBRACE),
             Some('}') => Some(Token::RBRACE),
-            Some(string) => {
-                let string = self.collect_str(string);
-                match string.parse::<u8>().is_ok() {
-                    true => Some(Token::INT(string)),
-                    false => Some(Token::IDENT(string))
-                }
-            },
+            Some(string) => self.num_ident_or_keyword(string) 
         }
     }
+
+    pub fn num_ident_or_keyword(&mut self, character: char) -> Option<Token> {
+        let FN = String::from("fn");
+        let LET = String::from("let");
+        match self.collect_str(character) {
+            Some(ref string) if is_number(string) => Some(Token::INT(string.parse().unwrap())),
+            Some(ref string) if string == &FN => Some(Token::FUNCTION),
+            Some(ref string) if string == &LET => Some(Token::LET),
+            Some(string) => Some(Token::IDENT(string)),
+            _ => None
+        }
+    }
+
 
     pub fn pop_char(&mut self) -> Option<char> {
         match self.source.next() {
@@ -52,7 +56,7 @@ impl<'a> Lexer<'a> {
     }
 
     pub fn is_next_alphanumeric(&self) -> Option<bool> {
-        let mut source = self.source.clone();
+        let source = self.source.clone();
         match source.peekable().peek() {
             Some(value) => { 
                 Some(value.is_ascii_alphanumeric())
@@ -61,11 +65,11 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn collect_str(&mut self, unit: char) -> String {
+    pub fn collect_str(&mut self, unit: char) -> Option<String> {
         let mut unit = unit.to_string();
         while let Some(true) = self.is_next_alphanumeric() {
             unit.push(self.pop_char().unwrap_or_default())
         }
-        unit
+        Some(unit)
     }
 }

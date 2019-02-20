@@ -42,7 +42,7 @@ mod tests {
         while let Some(character) = lexer.pop_char() {
             match character.is_alphanumeric() {
                 true => {
-                    let word = lexer.collect_str(character);
+                    let word = lexer.collect_str(character).unwrap();
                     assert_eq!(word, answers[i]);
                     i += 1;
                 },
@@ -55,13 +55,28 @@ mod tests {
 
     #[test]
     fn next_token_returns_token() {
-        let source = String::from("let num = 5;");
+        let source = String::from("fn dothis(x, y) { return x + y; }; let num = 5;");
         let mut lexer = Lexer::Lexer::new(&source);
         let answers = vec![
-            Token::IDENT("let".to_string()), 
+            Token::FUNCTION,
+            Token::IDENT("dothis".to_string()),
+            Token::LPAREN,
+            Token::IDENT("x".to_string()),
+            Token::COMMA,
+            Token::IDENT("y".to_string()),
+            Token::RPAREN,
+            Token::LBRACE,
+            Token::IDENT("return".to_string()),
+            Token::IDENT("x".to_string()),
+            Token::PLUS,
+            Token::IDENT("y".to_string()),
+            Token::SEMICOLON,
+            Token::RBRACE,
+            Token::SEMICOLON,
+            Token::LET,
             Token::IDENT("num".to_string()), 
             Token::ASSIGN,
-            Token::INT("5".to_string()),
+            Token::INT(5),
             Token::SEMICOLON
         ];
         let mut i = 0;
@@ -70,4 +85,17 @@ mod tests {
             i += 1;
         }
     }
+
+    // #[test]
+    // fn is_next_alphanumeric_tests_correctly() {
+    //     let source = String::from("5; r");
+    //     let mut lexer = Lexer::Lexer::new(&source);
+    //     let answers = vec![true, false, false, true];
+    //     let mut i = 0;
+    //     while let Some(is_an) = lexer.is_next_alphanumeric() {
+    //         assert_eq!(is_an, answers[i]);
+    //         lexer.pop_char();
+    //         i += 1;
+    //     }
+    // }
 }

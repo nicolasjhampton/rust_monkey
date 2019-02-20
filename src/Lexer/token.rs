@@ -4,7 +4,7 @@ pub enum Token {
     ILLEGAL,
     EOF,
     IDENT(String),
-    INT(String),
+    INT(isize),
     ASSIGN,
     PLUS,
     COMMA,
