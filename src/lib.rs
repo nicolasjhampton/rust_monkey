@@ -16,7 +16,6 @@ mod tests {
            assert_eq!(value, answers[i]);
            i += 1;
         }
-        assert_eq!(lexer.source.as_str(), "");
         assert_eq!(lexer.pop_char(), None)
     }
 
@@ -50,7 +49,6 @@ mod tests {
                 _ => assert_eq!(character, '!')
             }
         }
-        assert_eq!(lexer.source.as_str(), "");
     }
 
     #[test]

@@ -2,18 +2,19 @@ mod token;
 pub use token::Token;
 
 use std::str::Chars;
+use std::iter::Peekable;
 
 fn is_number(string: &String) -> bool {
     string.parse::<u8>().is_ok()
 }
 
 pub struct Lexer<'a> {
-    pub source: Chars<'a>
+    pub source: Peekable<Chars<'a>>
 }
 
 impl<'a> Lexer<'a> {
     pub fn new(source: &'a String) -> Lexer {
-        let mut chars = source.chars();
+        let mut chars = source.chars().peekable();
         Lexer {
             source: chars
         } 
@@ -72,18 +73,16 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn is_next_char(&self, comp: char) -> bool {
-        let source = self.source.clone();
-        if let Some(value) = source.peekable().peek() {
+    pub fn is_next_char(&mut self, comp: char) -> bool {
+        if let Some(value) = self.source.peek() {
             value == &comp
         } else {
             false
         }
     }
 
-    pub fn is_next_alphanumeric(&self) -> Option<bool> {
-        let source = self.source.clone();
-        match source.peekable().peek() {
+    pub fn is_next_alphanumeric(&mut self) -> Option<bool> {
+        match self.source.peek() {
             Some(value) => { 
                 Some(value.is_ascii_alphanumeric())
             },
