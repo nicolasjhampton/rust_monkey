@@ -1,5 +1,5 @@
 mod token;
-use token::Token;
+pub use token::Token;
 
 use std::str::Chars;
 use std::iter::Peekable;
@@ -22,29 +22,33 @@ impl<'a> Lexer<'a> {
         } 
     }
 
-    pub fn next_token(&mut self) -> Token {
+    pub fn next_token(&mut self) -> Option<Token> {
         match self.pop_char() {
-            None => Token::EOF,
-            Some('=') => Token::ASSIGN,
-            Some('+') => Token::PLUS,
-            Some(',') => Token::COMMA,
-            Some(';') => Token::SEMICOLON,
-            Some('(') => Token::LPAREN,
-            Some(')') => Token::RPAREN,
-            Some('{') => Token::LBRACE,
-            Some('}') => Token::RBRACE,
+            None => None,
+            Some('=') => Some(Token::ASSIGN),
+            Some('+') => Some(Token::PLUS),
+            Some(',') => Some(Token::COMMA),
+            Some(';') => Some(Token::SEMICOLON),
+            Some('(') => Some(Token::LPAREN),
+            Some(')') => Some(Token::RPAREN),
+            Some('{') => Some(Token::LBRACE),
+            Some('}') => Some(Token::RBRACE),
             Some(string) => {
                 let string = self.collect_str(string);
                 match string.parse::<u8>().is_ok() {
-                    true => Token::INT(string),
-                    false => Token::IDENT(string)
+                    true => Some(Token::INT(string)),
+                    false => Some(Token::IDENT(string))
                 }
             },
         }
     }
 
     pub fn pop_char(&mut self) -> Option<char> {
-        self.source.next()
+        match self.source.next() {
+            Some(' ') => self.pop_char(),
+            Some(value) => Some(value),
+            None => None
+        }
     }
 
     pub fn is_next_alphanumeric(&self) -> Option<bool> {

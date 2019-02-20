@@ -1,8 +1,3 @@
-// pub trait Token {
-//     fn token_type(&self) -> String;
-//     fn literal(&self) -> String;
-// }
-
 #[derive(Debug)]
 #[derive(PartialEq)]
 pub enum Token {
