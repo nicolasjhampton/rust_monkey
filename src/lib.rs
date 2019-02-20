@@ -55,7 +55,7 @@ mod tests {
 
     #[test]
     fn next_token_returns_token() {
-        let source = String::from("fn dothis(x, y) { return x + y; }; let num = 5;");
+        let source = String::from("fn dothis(x, y) { return x + y == 6; }; let num = 5; 5 != 6;");
         let mut lexer = Lexer::Lexer::new(&source);
         let answers = vec![
             Token::FUNCTION,
@@ -70,6 +70,8 @@ mod tests {
             Token::IDENT("x".to_string()),
             Token::PLUS,
             Token::IDENT("y".to_string()),
+            Token::EQ,
+            Token::INT(6),
             Token::SEMICOLON,
             Token::RBRACE,
             Token::SEMICOLON,
@@ -77,6 +79,10 @@ mod tests {
             Token::IDENT("num".to_string()), 
             Token::ASSIGN,
             Token::INT(5),
+            Token::SEMICOLON,
+            Token::INT(5),
+            Token::NE,
+            Token::INT(6),
             Token::SEMICOLON
         ];
         let mut i = 0;

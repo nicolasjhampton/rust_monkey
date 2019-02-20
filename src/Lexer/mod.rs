@@ -22,7 +22,6 @@ impl<'a> Lexer<'a> {
     pub fn next_token(&mut self) -> Option<Token> {
         match self.pop_char() {
             None => None,
-            Some('=') => Some(Token::ASSIGN),
             Some('+') => Some(Token::PLUS),
             Some(',') => Some(Token::COMMA),
             Some(';') => Some(Token::SEMICOLON),
@@ -30,6 +29,24 @@ impl<'a> Lexer<'a> {
             Some(')') => Some(Token::RPAREN),
             Some('{') => Some(Token::LBRACE),
             Some('}') => Some(Token::RBRACE),
+            Some('=') => {
+                match self.is_next_char('=') {
+                    true => {
+                        self.pop_char();
+                        Some(Token::EQ)
+                    },
+                    false => Some(Token::ASSIGN)
+                }
+            },
+            Some('!') => {
+                match self.is_next_char('=') {
+                    true => {
+                        self.pop_char();
+                        Some(Token::NE)
+                    },
+                    false => Some(Token::NOT)
+                }
+            },
             Some(string) => self.num_ident_or_keyword(string) 
         }
     }
@@ -52,6 +69,15 @@ impl<'a> Lexer<'a> {
             Some(' ') => self.pop_char(),
             Some(value) => Some(value),
             None => None
+        }
+    }
+
+    pub fn is_next_char(&self, comp: char) -> bool {
+        let source = self.source.clone();
+        if let Some(value) = source.peekable().peek() {
+            value == &comp
+        } else {
+            false
         }
     }
 
